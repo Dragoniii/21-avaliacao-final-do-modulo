@@ -23,7 +23,7 @@ Regras
 ● Cada recado deve ser de um único usuário.
 */
 
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from "node:crypto";
 import express from "express";
 const app = express();
 app.use(express.json());
@@ -41,24 +41,24 @@ app.get("/notes", (req, res) => {
 
 app.get("/users/:id", (req, res) => {
   const id = req.params.id;
-  const user = users.find((user) => Number(user.id) === Number(id));
+  const user = users.find((user) => user.id === id);
 
   if (!user) {
     return res.status(404).json("User with specified ID not found!");
   }
 
-  return res.status(200).json(car);
+  return res.status(200).json(user);
 });
 
 app.get("/notes/:id", (req, res) => {
   const id = req.params.id;
-  const note = notes.find((note) => Number(note.id) === Number(id));
+  const note = notes.find((note) => note.id === id);
 
   if (!note) {
     return res.status(404).json("Note with specified ID not found!");
   }
 
-  return res.status(200).json(car);
+  return res.status(200).json(note);
 });
 
 app.post("/newuser", (req, res) => {
@@ -80,6 +80,7 @@ app.post("/newnote", (req, res) => {
 
   const newnote = {
     id: randomUUID(),
+    user: infoNewNote.user,
     title: infoNewNote.title,
     description: infoNewNote.description,
   };
@@ -88,25 +89,54 @@ app.post("/newnote", (req, res) => {
   return res.status(201).json(newnote);
 });
 
-/*
-app.put("/updatecar/:id", (req, res) => {
-  const infoUpdateCar = req.body;
+app.put("/updateuser/:id", (req, res) => {
+  const infoUpdateUser = req.body;
   const params = req.params;
 
-  const carToUpdate = cars.findIndex((car) => car.id === Number(params.id));
+  const userToUpdate = users.findIndex((user) => user.id === params.id);
 
-  const carUpdated = {
-    id: Number(params.id),
-    model: infoUpdateCar.model,
-    brand: infoUpdateCar.brand,
-    color: infoUpdateCar.color,
-    year: infoUpdateCar.year,
-    price: infoUpdateCar.price,
+  const userUpdated = {
+    id: infoUpdateUser.id,
+    name: infoUpdateUser.name,
+    email: infoUpdateUser.email,
+    password: infoUpdateUser.password,
   };
 
-  cars[carToUpdate] = carUpdated;
-  return res.status(201).json(carUpdated);
+  users[userToUpdate] = userUpdated;
+  return res.status(201).json(userUpdated);
 });
-*/
+
+app.put("/updatenote/:id", (req, res) => {
+  const infoUpdateNote = req.body;
+  const params = req.params;
+
+  const noteToUpdate = notes.findIndex((note) => note.id === params.id);
+
+  const noteUpdated = {
+    id: infoUpdateNote.id,
+    user: infoUpdateNote.user,
+    title: infoUpdateNote.title,
+    description: infoUpdateNote.description,
+  };
+
+  notes[noteToUpdate] = noteUpdated;
+  return res.status(201).json(noteUpdated);
+});
+
+app.delete("/deleteuser/:id", (req, res) => {
+  const params = req.params;
+  const userToDelete = users.findIndex((user) => user.id === params.id);
+
+  users.splice(userToDelete, 1);
+  return res.status(201).json("User deleted successfully");
+});
+
+app.delete("/deletenote/:id", (req, res) => {
+  const params = req.params;
+  const noteToDelete = notes.findIndex((note) => notes.id === note.id);
+  
+  notes.splice(noteToDelete, 1);
+  return res.status(201).json("User deleted successfully");
+});
 
 app.listen(8080, () => console.log("Server Started"));
